@@ -1,0 +1,82 @@
+@import '~antd/es/style/themes/default.less';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+
+canvas {
+  display: block;
+}
+.m10{
+  margin-right: 10px;
+}
+.link{
+  cursor: pointer;
+  color: #1890FF;
+  margin-right: 10px;
+  &:hover{
+    color: #40a9ff;
+  }
+  
+}
+.mr20{
+  margin-right: 20px;
+}
+
+.ant-pro-page-header-wrap-children-content{
+  background: #fff;
+  padding: 20px;
+}
+
+.ant-select{
+  width: 100%;
+}
+.h10{
+  height: 10px;
+}
+.h30{
+  height: 30px;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.iimg{
+  width: 30px;
+}
+.home{
+  background:#f0f2f5;
+}
+ul,
+ol {
+  list-style: none;
+}
+
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
