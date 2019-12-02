@@ -1,7 +1,7 @@
 import { reloadAuthorized } from './Authorized'; // use localStorage to store the authority info, which might be sent from server in actual project.
 import cookie from 'react-cookies'
 export function getAuthority(str) {
-  let currentUserAuthor = JSON.parse(localStorage.getItem('currentUser')).authority
+  let currentUserAuthor = JSON.parse(localStorage.getItem('currentUser')) ? JSON.parse(localStorage.getItem('currentUser')).authority : []
   let authourList = currentUserAuthor.map(item => item.aname)
   console.log(authourList)
   const authorityString =
