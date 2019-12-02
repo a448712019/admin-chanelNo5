@@ -1,25 +1,27 @@
-import { Alert, Checkbox, Icon, notification } from 'antd';
-import { FormattedMessage, formatMessage } from 'umi-plugin-react/locale';
-import React, { Component } from 'react';
-import Link from 'umi/link';
-import { connect } from 'dva';
-import LoginComponents from './components/Login';
-import styles from './style.less';
+import { Alert, Checkbox, Icon, notification } from "antd";
+import { FormattedMessage, formatMessage } from "umi-plugin-react/locale";
+import React, { Component } from "react";
+import Link from "umi/link";
+import { connect } from "dva";
+import LoginComponents from "./components/Login";
+import styles from "./style.less";
+import cookie from "react-cookies";
+import { getAuthority } from "@/utils/authority";
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = LoginComponents;
 
 @connect(({ login, loading }) => ({
   userLogin: login,
-  submitting: loading.effects['login/login'],
+  submitting: loading.effects["login/login"]
 }))
 class Login extends Component {
   loginForm = undefined;
   state = {
-    type: 'account',
-    autoLogin: true,
+    type: "account",
+    autoLogin: true
   };
   changeAutoLogin = e => {
     this.setState({
-      autoLogin: e.target.checked,
+      autoLogin: e.target.checked
     });
   };
   handleSubmit = (err, values) => {
@@ -28,20 +30,29 @@ class Login extends Component {
     if (!err) {
       const { dispatch } = this.props;
       dispatch({
-        type: 'login/login',
+        type: "login/login",
         payload: { ...values, type },
-        callback: (res) => {
-          if(res.status == 1){
+        callback: res => {
+          if (res.status == 1) {
             notification.success({
               message: res.message,
               duration: 1.5
-            })
-            this.props.history.push('/')
-          }else{
+            });
+            // getAuthority()
+            this.props.history.push("/");
+            // let timer = setInterval(() => {
+            //   console.log(123)
+            //   console.log(localStorage.getItem('currentUser'))
+            //   if(localStorage.getItem('currentUser')){
+
+            //     clearInterval(timer)
+            //   }
+            // }, 100)
+          } else {
             notification.error({
               message: res.message,
               duration: 1.5
-            })
+            });
           }
         }
       });
@@ -49,7 +60,7 @@ class Login extends Component {
   };
   onTabChange = type => {
     this.setState({
-      type,
+      type
     });
   };
   onGetCaptcha = () =>
@@ -58,7 +69,7 @@ class Login extends Component {
         return;
       }
 
-      this.loginForm.validateFields(['mobile'], {}, async (err, values) => {
+      this.loginForm.validateFields(["mobile"], {}, async (err, values) => {
         if (err) {
           reject(err);
         } else {
@@ -66,8 +77,8 @@ class Login extends Component {
 
           try {
             const success = await dispatch({
-              type: 'login/getCaptcha',
-              payload: values.mobile,
+              type: "login/getCaptcha",
+              payload: values.mobile
             });
             resolve(!!success);
           } catch (error) {
@@ -79,7 +90,7 @@ class Login extends Component {
   renderMessage = content => (
     <Alert
       style={{
-        marginBottom: 24,
+        marginBottom: 24
       }}
       message={content}
       type="error"
@@ -104,7 +115,7 @@ class Login extends Component {
           <Tab
             key="account"
             tab={formatMessage({
-              id: 'user-login.login.tab-login-credentials',
+              id: "user-login.login.tab-login-credentials"
             })}
           >
             {/* {status === 'error' &&
@@ -124,9 +135,9 @@ class Login extends Component {
                 {
                   required: true,
                   message: formatMessage({
-                    id: 'user-login.userName.required',
-                  }),
-                },
+                    id: "user-login.userName.required"
+                  })
+                }
               ]}
             />
             <Password
@@ -138,9 +149,9 @@ class Login extends Component {
                 {
                   required: true,
                   message: formatMessage({
-                    id: 'user-login.password.required',
-                  }),
-                },
+                    id: "user-login.password.required"
+                  })
+                }
               ]}
               onPressEnter={e => {
                 e.preventDefault();
@@ -151,14 +162,11 @@ class Login extends Component {
               }}
             />
           </Tab>
-          
-       
-          
+
           <Submit loading={submitting}>
             <FormattedMessage id="user-login.login.login" />
           </Submit>
           <div className={styles.other}>
-           
             <Link className={styles.register} to="/user/register">
               <FormattedMessage id="userandlogin.login.signup" />
             </Link>

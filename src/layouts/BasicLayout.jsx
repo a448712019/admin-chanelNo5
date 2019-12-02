@@ -3,16 +3,16 @@
  * You can view component api by:
  * https://github.com/ant-design/ant-design-pro-layout
  */
-import ProLayout, { DefaultFooter } from '@ant-design/pro-layout';
-import React, { useEffect } from 'react';
-import Link from 'umi/link';
-import { connect } from 'dva';
-import { Icon, Result, Button } from 'antd';
-import { formatMessage } from 'umi-plugin-react/locale';
-import Authorized from '@/utils/Authorized';
-import RightContent from '@/components/GlobalHeader/RightContent';
-import { isAntDesignPro, getAuthorityFromRouter } from '@/utils/utils';
-import logo from '../assets/logo.svg';
+import ProLayout, { DefaultFooter } from "@ant-design/pro-layout";
+import React, { useEffect } from "react";
+import Link from "umi/link";
+import { connect } from "dva";
+import { Icon, Result, Button } from "antd";
+import { formatMessage } from "umi-plugin-react/locale";
+import Authorized from "@/utils/Authorized";
+import RightContent from "@/components/GlobalHeader/RightContent";
+import { isAntDesignPro, getAuthorityFromRouter } from "@/utils/utils";
+import logo from "../assets/logo.svg";
 const noMatch = (
   <Result
     status="403"
@@ -31,25 +31,21 @@ const noMatch = (
  */
 const menuDataRender = menuList =>
   menuList.map(item => {
-    const localItem = { ...item, children: item.children ? menuDataRender(item.children) : [] };
+    const localItem = {
+      ...item,
+      children: item.children ? menuDataRender(item.children) : []
+    };
     return Authorized.check(item.authority, localItem, null);
   });
-  
 
-const defaultFooterDom = (
-  null
-);
+const defaultFooterDom = null;
 
 const footerRender = () => {
   if (!isAntDesignPro()) {
     return defaultFooterDom;
   }
 
-  return (
-    <>
-      
-    </>
-  );
+  return <></>;
 };
 
 const BasicLayout = props => {
@@ -58,8 +54,8 @@ const BasicLayout = props => {
     children,
     settings,
     location = {
-      pathname: '/',
-    },
+      pathname: "/"
+    }
   } = props;
   /**
    * constructor
@@ -68,11 +64,11 @@ const BasicLayout = props => {
   useEffect(() => {
     if (dispatch) {
       dispatch({
-        type: 'user/fetchCurrent',
+        type: "user/fetchCurrent"
       });
-      dispatch({
-        type: 'settings/getSetting',
-      });
+      // dispatch({
+      //   type: 'settings/getSetting',
+      // });
     }
   }, []);
   /**
@@ -82,14 +78,17 @@ const BasicLayout = props => {
   const handleMenuCollapse = payload => {
     if (dispatch) {
       dispatch({
-        type: 'global/changeLayoutCollapsed',
-        payload,
+        type: "global/changeLayoutCollapsed",
+        payload
       });
     }
   }; // get children authority
 
-  const authorized = getAuthorityFromRouter(props.route.routes, location.pathname || '/') || {
-    authority: undefined,
+  const authorized = getAuthorityFromRouter(
+    props.route.routes,
+    location.pathname || "/"
+  ) || {
+    authority: undefined
   };
   return (
     <ProLayout
@@ -110,18 +109,18 @@ const BasicLayout = props => {
       }}
       breadcrumbRender={(routers = []) => [
         {
-          path: '/',
+          path: "/",
           breadcrumbName: formatMessage({
-            id: 'menu.home',
-            defaultMessage: 'Home',
-          }),
+            id: "menu.home",
+            defaultMessage: "Home"
+          })
         },
-        ...routers,
+        ...routers
       ]}
       itemRender={(route, params, routes, paths) => {
         const first = routes.indexOf(route) === 0;
         return first ? (
-          <Link to={paths.join('/')}>{route.breadcrumbName}</Link>
+          <Link to={paths.join("/")}>{route.breadcrumbName}</Link>
         ) : (
           <span>{route.breadcrumbName}</span>
         );
@@ -142,5 +141,5 @@ const BasicLayout = props => {
 
 export default connect(({ global, settings }) => ({
   collapsed: global.collapsed,
-  settings,
+  settings
 }))(BasicLayout);

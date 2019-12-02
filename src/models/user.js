@@ -1,36 +1,40 @@
-import { queryCurrent, query as queryUsers } from '@/services/user';
-import cookie from 'react-cookies'
+import { queryCurrent, query as queryUsers } from "@/services/user";
+import { reloadAuthorized } from "@/utils/Authorized";
+import cookie from "react-cookies";
 const UserModel = {
-  namespace: 'user',
+  namespace: "user",
   state: {
-    currentUser: {},
+    currentUser: {}
   },
   effects: {
     *fetch(payload, { call, put }) {
-      console.log(123)
+      console.log(123);
       const response = yield call(queryUsers);
       yield put({
-        type: 'save',
-        payload: response,
+        type: "save",
+        payload: response
       });
     },
 
     *fetchCurrent(payload, { call, put }) {
-      console.log(11)
-      console.log(cookie.load('currentUser'))
-      let currentUser = yield(cookie.load('currentUser'))
-      console.log(currentUser)
-      if(currentUser){
+      console.log(11);
+      console.log(cookie.load("currentUser"));
+      let currentUser = yield cookie.load("currentUser");
+
+      console.log(currentUser);
+      if (currentUser) {
+        currentUser.status = true;
         yield put({
-          type: 'saveCurrentUser',
-          payload: currentUser,
+          type: "saveCurrentUser",
+          payload: currentUser
         });
-      }else{
+        // reloadAuthorized()
+      } else {
         yield put({
-          type: 'saveCurrentUser',
-          payload: '',
+          type: "saveCurrentUser",
+          payload: ""
         });
-        location.href = '/user/login'
+        location.href = "/user/login";
       }
       // const response = yield call(queryCurrent);
       // console.log(response)
@@ -38,7 +42,7 @@ const UserModel = {
       //   type: 'saveCurrentUser',
       //   payload: response,
       // });
-    },
+    }
   },
   reducers: {
     saveCurrentUser(state, action) {
@@ -47,24 +51,24 @@ const UserModel = {
     save(state, action) {
       return {
         ...state,
-        list: action.payload,
+        list: action.payload
       };
     },
     changeNotifyCount(
       state = {
-        currentUser: {},
+        currentUser: {}
       },
-      action,
+      action
     ) {
       return {
         ...state,
         currentUser: {
           ...state.currentUser,
           notifyCount: action.payload.totalCount,
-          unreadCount: action.payload.unreadCount,
-        },
+          unreadCount: action.payload.unreadCount
+        }
       };
-    },
-  },
+    }
+  }
 };
 export default UserModel;
