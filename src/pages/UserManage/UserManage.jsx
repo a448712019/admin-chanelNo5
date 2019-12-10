@@ -15,7 +15,8 @@ import {
   notification,
   Upload,
   Transfer,
-  Switch
+  Switch,
+  Card
 } from "antd";
 import { PageHeaderWrapper } from "@ant-design/pro-layout";
 import EditUser from "@/components/Module/EditUser/EditUser";
@@ -119,9 +120,82 @@ export default class UserManage extends React.Component {
     showSearch: false,
     keyword: ""
   };
-  onChange = nextTargetKeys => {
+  onChange = (nextTargetKeys, direction) => {
+    console.log(nextTargetKeys, direction);
+    if (direction === "left") {
+      this.setState({ targetKeys: nextTargetKeys });
+      return;
+    }
+    const uploadUser = this.props.userManage.uploadUser;
+    let selUser = [];
+    uploadUser.forEach(item => {
+      if (nextTargetKeys.indexOf(item.key) >= 0) {
+        selUser.push(item);
+      }
+    });
+
+    // selUser.forEach(item => {
+    //   item.batch = keyword;
+    //   delete item.key;
+    // });
+    console.log(selUser);
+    const key = `open${Date.now()}`;
+    let disableArr = selUser.filter(item => item.status);
+    console.log(disableArr);
+    if (disableArr.length > 0) {
+      notification.open({
+        message: "分期失败",
+        duration: null,
+        description: (
+          <div className={styles.cardBox}>
+            {disableArr.map((item, index) => (
+              <Card key={index} bordered={false} key={index}>
+                <div>
+                  {item.username} {item.phone}
+                </div>
+                <div>已有期数 {item.batch}</div>
+                {item.delete == "1" && <div>用户状态: 已离职</div>}
+              </Card>
+            ))}
+
+            <div style={{ color: "red" }}>是否进行覆盖</div>
+          </div>
+        ),
+        btn: (
+          <Button
+            type="primary"
+            onClick={() => this.nextChange(nextTargetKeys, key)}
+          >
+            进行覆盖
+          </Button>
+        ),
+        colse: <Button>取消</Button>,
+        key
+      });
+    } else {
+      this.setState({ targetKeys: nextTargetKeys });
+    }
+    // this.props.dispatch({
+    //   type: "userManage/submitUser",
+    //   payload: {
+    //     screen: JSON.stringify(selUser)
+    //   },
+    //   callback: res => {
+    //     if (res.status == 1) {
+    //       this.handleColse();
+    //       this.getData();
+    //     }
+    //     notification.info({
+    //       message: res.message,
+    //       duration: 1.5
+    //     });
+    //   }
+    // });
     console.log(nextTargetKeys);
+  };
+  nextChange = (nextTargetKeys, key) => {
     this.setState({ targetKeys: nextTargetKeys });
+    notification.close(key);
   };
   submitUser = () => {
     const { targetKeys, keyword } = this.state;
@@ -153,15 +227,29 @@ export default class UserManage extends React.Component {
       delete item.key;
     });
     console.log(selUser);
+    const key = `open${Date.now()}`;
+    let disableArr = selUser.filter(item => item.status);
+    console.log(disableArr);
+
+    let obj = {};
+    let keyArr = Object.keys(selUser[0]);
+    selUser.forEach((item, index) => {
+      // obj[`[${0}][${}]`]
+      keyArr.forEach(items => {
+        obj[`screen[${index}][${items}]`] = item[items];
+      });
+    });
+    console.log(obj);
     this.props.dispatch({
       type: "userManage/submitUser",
       payload: {
-        screen: JSON.stringify(selUser)
+        ...obj
       },
       callback: res => {
         if (res.status == 1) {
           this.handleColse();
           this.getData();
+          this.setState({ targetKeys: [] });
         }
         notification.info({
           message: res.message,
@@ -273,10 +361,10 @@ export default class UserManage extends React.Component {
             }
           });
         }
-        notification.success({
-          message: res.message,
-          duration: 1.5
-        });
+        // notification.success({
+        //   message: res.message,
+        //   duration: 1.5
+        // });
       }
     });
   };
@@ -452,8 +540,8 @@ export default class UserManage extends React.Component {
               {getFieldDecorator("sort")(
                 <Select>
                   <Select.Option value="">全部</Select.Option>
-                  {allClassL.map(item => (
-                    <Select.Option value={item.value}>
+                  {allClassL.map((item, index) => (
+                    <Select.Option key={index} value={item.value}>
                       {item.label}
                     </Select.Option>
                   ))}
@@ -484,39 +572,41 @@ export default class UserManage extends React.Component {
             onChange: value => this.pageChange({ page: value })
           }}
         />
-        <Modal
-          width={1000}
-          visible={this.state.selUserModal.isShow}
-          onCancel={this.handleColse}
-          onOk={this.submitUser}
-          title={
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>用户分期</div>
-              <Input
-                value={this.state.keyword}
-                onChange={this.numChange}
-                placeholder="请填写期数"
-                style={{ width: "200px", marginRight: "20px" }}
+        {this.state.selUserModal.isShow && (
+          <Modal
+            width={1000}
+            visible={this.state.selUserModal.isShow}
+            onCancel={this.handleColse}
+            onOk={this.submitUser}
+            title={
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div>用户分期</div>
+                <Input
+                  value={this.state.keyword}
+                  onChange={this.numChange}
+                  placeholder="请填写期数"
+                  style={{ width: "200px", marginRight: "20px" }}
+                />
+              </div>
+            }
+          >
+            <div>
+              <TableTransfer
+                dataSource={this.props.userManage.uploadUser}
+                targetKeys={targetKeys}
+                showSearch={true}
+                filterOption={(inputValue, item) =>
+                  item.username.indexOf(inputValue) !== -1 ||
+                  item.Worknumber.indexOf(inputValue) !== -1 ||
+                  item.phone.indexOf(inputValue) !== -1
+                }
+                onChange={this.onChange}
+                leftColumns={leftTableColumns}
+                rightColumns={leftTableColumns}
               />
             </div>
-          }
-        >
-          <div>
-            <TableTransfer
-              dataSource={this.props.userManage.uploadUser}
-              targetKeys={targetKeys}
-              showSearch={true}
-              filterOption={(inputValue, item) =>
-                item.username.indexOf(inputValue) !== -1 ||
-                item.Worknumber.indexOf(inputValue) !== -1 ||
-                item.phone.indexOf(inputValue) !== -1
-              }
-              onChange={this.onChange}
-              leftColumns={leftTableColumns}
-              rightColumns={leftTableColumns}
-            />
-          </div>
-        </Modal>
+          </Modal>
+        )}
         {this.state.editUserModle.isShow && (
           <EditUser
             isShow={this.state.editUserModle.isShow}

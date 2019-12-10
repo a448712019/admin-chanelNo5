@@ -65,7 +65,7 @@ export default class TypeFour extends React.Component {
   editType = item => {
     this.props.form.setFieldsValue({
       typeTitle: item.title,
-      typeStatus: item.status
+      typeStatus: item.status == "1" ? true : false
     });
     this.setState({
       eidtTypeModal: {
@@ -111,7 +111,18 @@ export default class TypeFour extends React.Component {
         }
       ]
     });
+    if (value == "2") {
+      this.getQuestType();
+    }
     this.props.form.resetFields();
+  };
+  getQuestType = () => {
+    this.props.dispatch({
+      type: "theme/questType",
+      payload: {
+        cid: this.props.sid
+      }
+    });
   };
   reset = () => {
     this.props.form.resetFields();
@@ -137,6 +148,7 @@ export default class TypeFour extends React.Component {
             title: data.title,
             status: data.status == "1" ? true : false,
             type: data.type,
+            s_type: data.s_id,
             sel_type: data.sel_type,
             sort: data.sort
           });
@@ -168,15 +180,16 @@ export default class TypeFour extends React.Component {
       obj[`items[${index}][status]`] = item.status;
       obj[`items[${index}][judge]`] = item.judge;
     });
+    console.log(124);
     this.props.form.validateFields((err, values) => {
       // if(err)return;
       toUndefind(values);
       this.props.dispatch({
-        type: `theme/${current ? "updateFour" : "current"}`,
+        type: `theme/${current ? "updateFour" : "addFour"}`,
         payload: {
           id: current ? current.id : "",
           ...values,
-          sid: this.props.sid,
+          cid: this.props.sid,
           ...obj
         },
         callback: res => {
@@ -229,6 +242,7 @@ export default class TypeFour extends React.Component {
   componentDidMount() {
     this.getData();
     this.getTypeList();
+    this.getQuestType();
   }
   deleteType = item => {
     this.props.dispatch({
@@ -260,7 +274,8 @@ export default class TypeFour extends React.Component {
           this.state.eidtTypeModal.current ? "editType" : "addType"
         }`,
         payload: {
-          ...obj
+          ...obj,
+          cid: this.props.sid
         },
         callback: res => {
           notification.info({
@@ -305,6 +320,21 @@ export default class TypeFour extends React.Component {
       content
     });
   };
+  delete = item => {
+    this.props.dispatch({
+      type: "theme/delQuest",
+      payload: {
+        id: item.id
+      },
+      callback: res => {
+        notification.success({
+          message: res.message,
+          duration: 1.5
+        });
+        this.getData();
+      }
+    });
+  };
   render() {
     const { tabKey, content, current } = this.state;
     const {
@@ -327,6 +357,11 @@ export default class TypeFour extends React.Component {
         title: "排序",
         key: "sort",
         dataIndex: "sort"
+      },
+      {
+        title: "分类",
+        key: "s_type",
+        dataIndex: "s_type"
       },
       {
         title: "状态",
@@ -402,152 +437,174 @@ export default class TypeFour extends React.Component {
         dataIndex: "action",
         render: (_, item, index) => (
           <div>
-            <span className="link" onClick={() => this.editType(item)}>
-              编辑
-            </span>
+            {item.id > 0 && (
+              <span className="link" onClick={() => this.editType(item)}>
+                编辑
+              </span>
+            )}
             <span className="link" onClick={() => this.openSetNumModal(item)}>
               设置选题数量
             </span>
-            <Popconfirm
-              title="确认删除吗？"
-              onConfirm={() => this.deleteType(item)}
-            >
-              <span className="link">删除</span>
-            </Popconfirm>
+            {item.id > 0 && (
+              <Popconfirm
+                title="确认删除吗？"
+                onConfirm={() => this.deleteType(item)}
+              >
+                <span className="link">删除</span>
+              </Popconfirm>
+            )}
           </div>
         )
       }
     ];
+    const eng = ["A", "B", "C", "D", "E", "F", "G"];
     return (
-      <Tabs activeKey={tabKey} onChange={this.tabChange}>
-        <TabPane tab="题库管理" key="1">
-          <Table
-            columns={column}
-            rowKey={item => item.id}
-            dataSource={this.props.theme.typeFourList}
-          />
-        </TabPane>
-        <TabPane tab="添加题目" key="2">
-          <Row>
-            <Col span={24}>
-              <Form.Item {...formItemLayout} label="题目">
-                {getFieldDecorator("title", {
-                  // rules: [{ required: true, message: '请输入题目' }],
-                })(<Input placeholder="题目" autoComplete="off" />)}
-              </Form.Item>
-              <Form.Item {...formItemLayout} label="题目类型">
-                {getFieldDecorator("type", {
-                  initialValue: "0"
-                })(
-                  <Select>
-                    <Select.Option value="0">图片</Select.Option>
-                    <Select.Option value="1">文字</Select.Option>
-                    <Select.Option value="2">多图片</Select.Option>
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item {...formItemLayout} label="单选/多选">
-                {getFieldDecorator("sel_type", {
-                  initialValue: "radio"
-                })(
-                  <Select>
-                    <Select.Option value="radio">单选</Select.Option>
-                    <Select.Option value="checkbox">多选</Select.Option>
-                  </Select>
-                )}
-              </Form.Item>
-              <Form.Item {...formItemLayout} label="排序">
-                {getFieldDecorator("sort", {
-                  // rules: [{ required: true, message: '排序' }],
-                })(<Input placeholder="排序" autoComplete="off" />)}
-              </Form.Item>
-              <Form.Item {...formItemLayout} label="状态">
-                {getFieldDecorator("status", {
-                  valuePropName: "checked"
-                  // rules: [{ required: true, message: '培训说明' }],
-                })(<Switch />)}
-              </Form.Item>
-              <Form.Item {...formItemLayout} colon={false} label=" ">
-                <Button type="primary" onClick={this.addItem}>
-                  添加选项
-                </Button>
-              </Form.Item>
-              {content.map((item, index) => (
-                <Row key={index} style={{ marginBottom: "10px" }}>
-                  <Col>
-                    <Col span={5}></Col>
-                    <Col
-                      span={19}
-                      style={{ display: "flex", alignItems: "center" }}
-                    >
-                      <Col span={8}>
-                        <Col span={22} style={{ textAlign: "center" }}>
-                          视频跳转:
+      <div>
+        <Tabs activeKey={tabKey} onChange={this.tabChange}>
+          <TabPane tab="题库管理" key="1">
+            <Table
+              columns={column}
+              rowKey={item => item.id}
+              dataSource={this.props.theme.typeFourList}
+            />
+          </TabPane>
+          <TabPane tab="添加题目" key="2">
+            <Row>
+              <Col span={24}>
+                <Form.Item {...formItemLayout} label="题目">
+                  {getFieldDecorator("title", {
+                    // rules: [{ required: true, message: '请输入题目' }],
+                  })(<Input placeholder="题目" autoComplete="off" />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="题目类型">
+                  {getFieldDecorator("type", {
+                    initialValue: "0"
+                  })(
+                    <Select>
+                      <Select.Option value="0">图片</Select.Option>
+                      <Select.Option value="1">文字</Select.Option>
+                      <Select.Option value="2">多图片</Select.Option>
+                    </Select>
+                  )}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="单选/多选">
+                  {getFieldDecorator("sel_type", {
+                    initialValue: "radio"
+                  })(
+                    <Select>
+                      <Select.Option value="radio">单选</Select.Option>
+                      <Select.Option value="checkbox">多选</Select.Option>
+                    </Select>
+                  )}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="题目分类">
+                  {getFieldDecorator("s_type", {
+                    // initialValue: "radio"
+                  })(
+                    <Select>
+                      {this.props.theme.questType.map((item, index) => (
+                        <Select.Option key={index} value={item.id}>
+                          {item.title}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  )}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="排序">
+                  {getFieldDecorator("sort", {
+                    // rules: [{ required: true, message: '排序' }],
+                  })(<Input placeholder="排序" autoComplete="off" />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} label="状态">
+                  {getFieldDecorator("status", {
+                    valuePropName: "checked"
+                    // rules: [{ required: true, message: '培训说明' }],
+                  })(<Switch />)}
+                </Form.Item>
+                <Form.Item {...formItemLayout} colon={false} label=" ">
+                  <Button type="primary" onClick={this.addItem}>
+                    添加选项
+                  </Button>
+                </Form.Item>
+                {content.map((item, index) => (
+                  <Row key={index} style={{ marginBottom: "10px" }}>
+                    <Col>
+                      <Col span={5}></Col>
+                      <Col
+                        span={19}
+                        style={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Col span={8}>
+                          <Col span={22} style={{ textAlign: "center" }}>
+                            选项{eng[index]}/图片地址:
+                          </Col>
+                          <Col span={22}>
+                            <TextArea
+                              onChange={e => this.itmeChange("judge", index, e)}
+                              value={item.judge}
+                            />
+                          </Col>
                         </Col>
-                        <Col span={22}>
-                          <TextArea
-                            onChange={e => this.itmeChange("judge", index, e)}
-                            value={item.judge}
-                          />
+                        <Col span={8}>
+                          <Col span={22} style={{ textAlign: "center" }}>
+                            正误:
+                          </Col>
+                          <Col
+                            span={22}
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              height: "52px"
+                            }}
+                          >
+                            <Switch
+                              onChange={e =>
+                                this.itmeChange("status", index, e)
+                              }
+                              checked={item.status == "true" ? true : false}
+                            />
+                          </Col>
                         </Col>
-                      </Col>
-                      <Col span={8}>
-                        <Col span={22} style={{ textAlign: "center" }}>
-                          正误:
-                        </Col>
-                        <Col
-                          span={22}
-                          style={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            height: "52px"
-                          }}
-                        >
-                          <Switch
-                            onChange={e => this.itmeChange("status", index, e)}
-                            checked={item.status == "true" ? true : false}
-                          />
-                        </Col>
-                      </Col>
-                      <Col span={8}>
-                        <Col span={22} style={{ textAlign: "center" }}></Col>
-                        <Col span={22}>
-                          <Button onClick={() => this.delItem(index)}>
-                            删除
-                          </Button>
+                        <Col span={8}>
+                          <Col span={22} style={{ textAlign: "center" }}></Col>
+                          <Col span={22}>
+                            <Button onClick={() => this.delItem(index)}>
+                              删除
+                            </Button>
+                          </Col>
                         </Col>
                       </Col>
                     </Col>
-                  </Col>
-                </Row>
-              ))}
-              <Form.Item
-                style={{ marginTop: "30px" }}
-                {...formItemLayout}
-                colon={false}
-                label=" "
-              >
-                <Button type="primary" className="mr20" onClick={this.submit}>
-                  {current ? "保存" : "创建"}
-                </Button>
-                <Button type="primary" onClick={this.reset}>
-                  重置
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
-        </TabPane>
-        <TabPane tab="分类设置" key="3">
-          <Button type="primary" onClick={this.addType}>
-            添加分类
-          </Button>
-          <Table
-            columns={column1}
-            dataSource={this.props.theme.typeList}
-            rowKey={item => item.id}
-          />
-        </TabPane>
+                  </Row>
+                ))}
+                <Form.Item
+                  style={{ marginTop: "30px" }}
+                  {...formItemLayout}
+                  colon={false}
+                  label=" "
+                >
+                  <Button type="primary" className="mr20" onClick={this.submit}>
+                    {current ? "保存" : "创建"}
+                  </Button>
+                  <Button type="primary" onClick={this.reset}>
+                    重置
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+          </TabPane>
+          <TabPane tab="分类设置" key="3">
+            <Button type="primary" onClick={this.addType}>
+              添加分类
+            </Button>
+            <Table
+              columns={column1}
+              dataSource={this.props.theme.typeList}
+              rowKey={item => item.id}
+            />
+          </TabPane>
+        </Tabs>
         {
           <Modal
             title={this.state.eidtTypeModal.current ? "编辑分类" : "添加分类"}
@@ -579,7 +636,7 @@ export default class TypeFour extends React.Component {
             })(<Input placeholder="选题数量" autoComplete="off" />)}
           </Form.Item>
         </Modal>
-      </Tabs>
+      </div>
     );
   }
 }

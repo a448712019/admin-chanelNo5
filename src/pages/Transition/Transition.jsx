@@ -135,7 +135,8 @@ export default class Transition extends React.Component {
     }
 
     this.props.dispatch({
-      type: "stageManage/addTransitionGroup",
+      // newAddTransitionGroup addTransitionGroup
+      type: `stageManage/${currentUser ? 'addTransitionGroup' : 'newAddTransitionGroup'}`,
       payload: {
         groupid: currentUser ? currentUser : "create",
         username,
@@ -153,6 +154,7 @@ export default class Transition extends React.Component {
           });
           this.getTransitionUserData();
           this.handleColse();
+          this.getData()
         }
       }
     });
@@ -433,13 +435,6 @@ export default class Transition extends React.Component {
             )}
           </Form.Item>
         </Modal>
-        {this.state.lookStudent.isShow && (
-          <LookTransitionStudentList
-            isShow={this.state.lookStudent.isShow}
-            handleColse={this.handleColse}
-            current={this.state.current}
-          />
-        )}
       </PageHeaderWrapper>
     );
   }

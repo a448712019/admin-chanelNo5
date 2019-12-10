@@ -9,7 +9,8 @@ import {
     sortList,
     downError,
     errorSelData,
-    questionDetail
+    questionDetail,
+    defaulltRecordData,
 } from '@/services/api';
 export default {
     namespace: 'record',
@@ -23,11 +24,52 @@ export default {
         sortList: [],
         sortData: '',
         questionDetail: '',
-        errorSelData: ''
+        errorSelData: '',
+
+        transitionRecordData: '',
     },
     effects: {
         *fetch({payload, callback}, { call, put }) {
             const response = yield call(getDayData, payload);
+            console.log(response)
+            if(response.status === 1){
+                yield put({
+                    type: 'save',
+                    payload: {
+                        dayData: response.data || []
+                    },
+                });
+            }
+            if(callback)callback(response)
+        },
+        *transitionFetch({payload, callback}, { call, put }) {
+            const response = yield call(getDayData, payload);
+            console.log(response)
+            if(response.status === 1){
+                yield put({
+                    type: 'save',
+                    payload: {
+                        transitionRecordData: response.data || []
+                    },
+                });
+            }
+            if(callback)callback(response)
+        },
+        *defaulltTransitionRecordData({payload, callback}, { call, put }) {
+            const response = yield call(defaulltRecordData, payload);
+            console.log(response)
+            if(response.status === 1){
+                yield put({
+                    type: 'save',
+                    payload: {
+                        transitionRecordData: response.data || []
+                    },
+                });
+            }
+            if(callback)callback(response)
+        },
+        *defaulltDayRecordData({payload, callback}, { call, put }) {
+            const response = yield call(defaulltRecordData, payload);
             console.log(response)
             if(response.status === 1){
                 yield put({

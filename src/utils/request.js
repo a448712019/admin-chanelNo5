@@ -65,9 +65,9 @@ function requests(url, option){
   if(option.isForm){
     let formDate = new FormData();
         for(let key in options.body){
-            if(typeof options.body[key] === 'object' && options.body[key].originFileObj){
-                options.body[key] = options.body[key].originFileObj;
-            }
+            // if(typeof options.body[key] === 'object' && options.body[key].originFileObj){
+            //     options.body[key] = options.body[key].originFileObj;
+            // }
             formDate.append(key, options.body[key])
         }
         options.body = formDate;

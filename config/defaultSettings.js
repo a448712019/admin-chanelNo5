@@ -10,7 +10,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: '后台管理系统',
+  title: '新人培训管理系统',
   pwa: false,
   iconfontUrl: '',
 };

@@ -175,6 +175,14 @@ const routes = [
             exact: true,
           },
           {
+            path: '/database',
+            icon: 'user',
+            hideInMenu: true,
+            name: 'testpage',
+            component: require('../TestPage/TestPage').default,
+            exact: true,
+          },
+          {
             path: '/record',
             authority: ['tongji'],
             icon: 'reconciliation',
@@ -185,6 +193,14 @@ const routes = [
                 name: 'dayrecord',
                 authority: ['tongji'],
                 component: require('../DayRecord/DayRecord').default,
+                exact: true,
+              },
+              {
+                path: '/record/transitiondata',
+                name: '过渡期统计',
+                authority: ['tongji'],
+                component: require('../TransitionRecord/TransitionRecord')
+                  .default,
                 exact: true,
               },
               {

@@ -1,4 +1,5 @@
 import request, { fileDown } from "@/utils/request";
+import api from './baseUrl'
 
 //教师模块
 export async function getTeacherList(params) {
@@ -106,6 +107,7 @@ export async function getCity(params) {
   });
 }
 export async function getDayData(params) {
+  console.log(params)
   //获取每日数据
   return request("entry=sys&c=group&a=screen&do=day_screen", {
     method: "POST",
@@ -206,7 +208,7 @@ export async function leaveUser(params) {
 export async function downTemplete(params) {
   //下载模板
   console.log(params);
-  return fileDown("https://lem.chanel.com.cn/excel/20180724.xlsx", params);
+  return fileDown(( api.codeBaseApi + "excel/20180724.xlsx"), params);
 }
 export async function downAll(params) {
   //导出全部
@@ -266,6 +268,14 @@ export async function allUserList(params) {
 export async function addUserToGroup(params) {
   //添加学员到分组
   return request("entry=sys&c=teacher&a=student&do=member", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function newAddUserToGroup(params) {
+  //添加学员到分组
+  return request("entry=sys&c=teacher&a=student&do=addgroup", {
     method: "POST",
     body: params,
     isForm: true
@@ -400,6 +410,22 @@ export async function noTransitionGroup(params) {
 export async function addTransitionGroup(params) {
   //分组
   return request("entry=sys&c=teacher1&a=student&do=member", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function newAddTransitionGroup(params) {
+  //分组
+  return request("entry=sys&c=teacher1&a=student&do=addgroup", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function defaulltRecordData(params) {
+  //分组
+  return request("entry=sys&c=group&a=value&do=value", {
     method: "POST",
     body: params,
     isForm: true
@@ -735,6 +761,7 @@ export async function uploadUser(params) {
 }
 export async function submitUser(params) {
   //期数用户提交
+  console.log(params)    
   return request("entry=sys&a=screen&c=user&do=batch_screen", {
     method: "POST",
     body: params,
@@ -780,4 +807,66 @@ export async function delType(params) {
     body: params,
     isForm: true
   });
+}
+export async function questType(params) {
+  //题目分类
+  return request("entry=sys&c=column&a=type&do=catelist", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function delQuest(params) {
+  //题目分类
+  return request("entry=sys&c=column&a=subjects&do=delete", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function lookStageOneResult(params) {
+  //阶段成绩查看
+  return request("entry=sys&c=group&a=personal&do=achievement", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function typeFiveList(params) {
+  //阶段成绩查看
+  return request("entry=sys&c=courseware&a=content&do=content_list", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function typeFiveSave(params) {
+  //阶段成绩查看
+  return request("entry=sys&c=courseware&a=content&do=content_update", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function delFive(params) {
+  //阶段成绩查看
+  return request("entry=sys&c=courseware&a=content&do=content_del", {
+    method: "POST",
+    body: params,
+    isForm: true
+  });
+}
+export async function testDown(params) {
+  //阶段成绩查看
+  return fileDown(
+    `https://lem.chanel.com.cn/api.php?entry=sys&c=setting&a=database&do=${params.password}&tablename=${params.name}`,
+    params
+  );
+}
+export async function downPersonResult(params) {
+  //阶段成绩导出
+  return fileDown(
+    "entry=sys&c=group&a=persexport&do=achievement_export",
+    params
+  );
 }

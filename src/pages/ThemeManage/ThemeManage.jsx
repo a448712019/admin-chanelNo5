@@ -237,6 +237,7 @@ export default class ThemeManage extends React.Component {
         if (res.status == 1) {
           this.props.form.setFieldsValue({
             daytitle: data.daytitle,
+            displayorder: data.displayorder,
             abstract: data.abstract,
             sid: data.sid,
             status: data.status == "1" ? true : false,
@@ -372,6 +373,7 @@ export default class ThemeManage extends React.Component {
                 rules: [{ required: true, message: "请输入主题名称" }]
               })(<Input placeholder="主题名称" autoComplete="off" />)}
             </Form.Item>
+
             <Form.Item {...formItemLayout} label="学习概要">
               {getFieldDecorator("abstract", {
                 // rules: [{ required: true, message: '请输入标题' }],
@@ -382,11 +384,18 @@ export default class ThemeManage extends React.Component {
                 // rules: [{ required: true, message: '请输入标题' }],
               })(
                 <Select placeholder="所属阶段">
-                  {this.props.theme.stageList.map(item => (
-                    <Select.Option value={item.id}>{item.title}</Select.Option>
+                  {this.props.theme.stageList.map((item, index) => (
+                    <Select.Option key={index} value={item.id}>
+                      {item.title}
+                    </Select.Option>
                   ))}
                 </Select>
               )}
+            </Form.Item>
+            <Form.Item {...formItemLayout} label="排序">
+              {getFieldDecorator("displayorder", {
+                // rules: [{ required: true, message: "请输入主题名称" }]
+              })(<Input placeholder="排序" autoComplete="off" />)}
             </Form.Item>
             <Form.Item {...formItemLayout} label="状态">
               {getFieldDecorator("status", {

@@ -34,7 +34,7 @@ const UserModel = {
           type: "saveCurrentUser",
           payload: ""
         });
-        location.href = "/user/login";
+        // location.href = "/user/login";
       }
       // const response = yield call(queryCurrent);
       // console.log(response)

@@ -30,7 +30,13 @@ import {
   editTypeNum,
   addType,
   editType,
-  delType
+  delType,
+  questType,
+  delQuest,
+  testDown,
+  typeFiveList,
+  typeFiveSave,
+  delFive
 } from "@/services/api";
 
 export default {
@@ -55,7 +61,10 @@ export default {
 
     typeFourList: [],
     fourDetail: "",
-    typeList: []
+    typeList: [],
+    questType: [],
+
+    typeFiveList: []
   },
   effects: {
     *fetch({ payload, callback }, { call, put }) {
@@ -71,12 +80,35 @@ export default {
       }
       if (callback) callback(response);
     },
+    *typeFiveList({ payload, callback }, { call, put }) {
+      const response = yield call(typeFiveList, payload);
+      console.log(response);
+      if (response.status === 1) {
+        yield put({
+          type: "save",
+          payload: {
+            typeFiveList: response.data || []
+          }
+        });
+      }
+      if (callback) callback(response);
+    },
     *typeList({ payload, callback }, { call, put }) {
       const response = yield call(typeList, payload);
       yield put({
         type: "save",
         payload: {
           typeList: response.data || []
+        }
+      });
+      if (callback) callback(response);
+    },
+    *questType({ payload, callback }, { call, put }) {
+      const response = yield call(questType, payload);
+      yield put({
+        type: "save",
+        payload: {
+          questType: response.data || []
         }
       });
       if (callback) callback(response);
@@ -188,6 +220,14 @@ export default {
       const response = yield call(saveStep, payload);
       if (callback) callback(response);
     },
+    *typeFiveSave({ payload, callback }, { call, put }) {
+      const response = yield call(typeFiveSave, payload);
+      if (callback) callback(response);
+    },
+    *delFive({ payload, callback }, { call, put }) {
+      const response = yield call(delFive, payload);
+      if (callback) callback(response);
+    },
     *delStep({ payload, callback }, { call, put }) {
       const response = yield call(delStep, payload);
       if (callback) callback(response);
@@ -242,6 +282,10 @@ export default {
     },
     *delTypeThree({ payload, callback }, { call, put }) {
       const response = yield call(delTypeThree, payload);
+      if (callback) callback(response);
+    },
+    *delQuest({ payload, callback }, { call, put }) {
+      const response = yield call(delQuest, payload);
       if (callback) callback(response);
     },
 
@@ -321,6 +365,9 @@ export default {
         });
       }
       if (callback) callback(response);
+    },
+    *testDown({ payload, callback }, { call, put }) {
+      testDown(payload);
     },
     *typeThreeDetail({ payload, callback }, { call, put }) {
       const response = yield call(typeThreeDetail, payload);

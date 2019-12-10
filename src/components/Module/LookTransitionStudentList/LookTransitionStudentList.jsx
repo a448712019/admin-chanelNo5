@@ -189,12 +189,12 @@ export default class LookTransitionStudentList extends React.Component {
             key: "delete",
             render: value => (
               <div>
-                {value == "0" ? (
-                  <Tag color="green">正常</Tag>
-                ) : (
-                  <Tag color="red">离职</Tag>
-                )}
-              </div>
+              {value == "1" ? (
+                <Tag color="red">离职</Tag>
+              ) : (
+                <Tag color="green">正常</Tag>
+              )}
+            </div>
             )
           },
           {

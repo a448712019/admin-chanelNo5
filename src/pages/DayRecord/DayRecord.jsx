@@ -8,7 +8,7 @@ import {
     Legend,
 } from "bizcharts";
 import DataSet from "@antv/data-set";
-import { Form, Row, Col, Select, Button, Statistic, Divider, notification } from 'antd'
+import { Form, Row, Col, Select, Button, Statistic, Divider, notification, Card } from 'antd'
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 
 const formItemLayout = {
@@ -21,10 +21,15 @@ const formItemLayout = {
 }))
 @Form.create()
 export default class DayRecord extends React.Component{
+    state = {
+        current: '',
+    }
     getData = (obj) => {
         this.props.dispatch({
             type: 'record/fetch',
-            payload: obj,
+            payload: {
+                ...obj,
+            },
             callback: (res) => {
                 if(res.status !== 1){
                     notification.error({
@@ -59,6 +64,59 @@ export default class DayRecord extends React.Component{
             }
         })
         return newObj
+    }
+    chartChange = (e) => {
+        console.log('123')
+        console.log(e)
+        if(!e.data) return
+        const data = e.data._origin;
+        console.log(data['比例'].substr(data['比例'].length - 1))
+        let index = data['比例'].substr(data['比例'].length - 1);
+        let currentItem = this.props.record.dayData.day[index - 1]
+        console.log(currentItem)
+        notification.info({
+            style: {
+                width: 600,
+                marginLeft: 335 - 600,
+            },
+            message: <div>{data['比例']}{data.name}</div>,
+            description: (
+                <Row>
+                    {
+                        data.name === '预习完成率' 
+                        ?
+                        (
+                            <Col>
+                                <Col span={6}>
+                                    <Statistic title="预习完成率" value={`${currentItem.finish}%`} />
+                                </Col>
+                                <Col span={6}>
+                                    <Statistic title="完成人数" value={`${currentItem.number}`} />
+                                </Col>
+                                <Col span={6}>
+                                    <Statistic title="未完成人数" value={`${currentItem.absent}`} />
+                                </Col>
+                            </Col>
+                        )
+                        :
+                        (
+                            <Col>
+                                <Col span={6}>
+                                    <Statistic title="满分比例" value={currentItem.average} />
+                                </Col>
+                                <Col span={6}>
+                                    <Statistic title="平均分" value={currentItem.full} />
+                                </Col>
+                                <Col span={6}>
+                                    <Statistic title="满分人数" value={currentItem.marks} />
+                                </Col>
+                            </Col>
+                        )
+                    }
+                </Row>
+            ),
+            duration: 10
+        })
     }
     handleSubmit = () => {
         this.props.form.validateFields((err, values) => {
@@ -98,7 +156,11 @@ export default class DayRecord extends React.Component{
         
     }
     componentDidMount() {
-        this.getData()
+        // this.getData()
+         this.props.dispatch({
+                type: 'record/defaulltDayRecordData',
+                payload: {}
+        })
         this.getCity()
         this.getYear()
         this.getTime()
@@ -131,7 +193,7 @@ export default class DayRecord extends React.Component{
         const colorMap = {
             "预习完成率": "#fae3d6",
             "满分比例": "#ef8481",
-          };
+        };
         return (
             <PageHeaderWrapper>
                 <Row>
@@ -187,10 +249,10 @@ export default class DayRecord extends React.Component{
                     </Col>
                 </Row>
                 <Divider />
-                {data.day && <Chart height={300} data={dv} forceFit>
+                {data.day && <Chart height={300}  onClick={this.chartChange} data={dv} forceFit>
                     <Axis name="比例" />
                     <Axis name="天数" />
-                    <Legend />
+                    <Legend/>
                     <Tooltip
                         crosshairs={{
                         type: "y"

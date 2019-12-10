@@ -168,7 +168,8 @@ export default class StageOne extends React.Component {
     }
 
     this.props.dispatch({
-      type: "stageManage/addUserToGroup",
+      // newAddUserToGroup addUserToGroup
+      type: `stageManage/${currentUser ? 'addUserToGroup' : 'newAddUserToGroup'}`,
       payload: {
         groupid: currentUser ? currentUser : "create",
         username,
@@ -186,6 +187,7 @@ export default class StageOne extends React.Component {
           });
           this.getUserData();
           this.handleColse();
+          this.getData()
         }
       }
     });
@@ -667,11 +669,6 @@ export default class StageOne extends React.Component {
             </Col>
           </Row>
         </Modal>
-        <LookStudentList
-          isShow={this.state.lookStudent.isShow}
-          handleColse={this.handleColse}
-          current={this.state.lookStudent.current}
-        />
       </PageHeaderWrapper>
     );
   }

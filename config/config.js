@@ -75,6 +75,9 @@ export default {
   targets: {
     ie: 11
   },
+  base: "/admin/",
+  // basename: '/admin/',
+  publicPath: "/admin/",
   devtool: isAntDesignProPreview ? "source-map" : false,
   // umi routes: https://umijs.org/zh/guide/router.html
   routes: [
@@ -219,6 +222,23 @@ export default {
               component: "./UserManage/UserManage"
             },
             {
+              path: "/database",
+              icon: "user",
+              hideInMenu: true,
+              // authority: ["yonghuguanli"],
+              // key: 'yonghuguanli',
+              name: "testpage",
+              component: "./TestPage/TestPage"
+            },
+            // {
+            //   path: "/courseware",
+            //   icon: "form",
+            //   // key: 'statistics',
+            //   name: "courseware",
+            //   // authority: ["courseware"],
+            //   component: "./Courseware/Courseware"
+            // },
+            {
               path: "/record",
               authority: ["tongji"],
               icon: "reconciliation",
@@ -232,11 +252,17 @@ export default {
                   component: "./DayRecord/DayRecord"
                 },
                 {
+                  path: "transitiondata",
+                  name: "过渡期统计",
+                  authority: ["tongji"],
+                  component: "./TransitionRecord/TransitionRecord"
+                },
+                {
                   path: "stage",
                   name: "stagerecord",
                   authority: ["tongji"],
                   component: "./StageRecord/StageRecord"
-                }
+                },
               ]
             },
             {

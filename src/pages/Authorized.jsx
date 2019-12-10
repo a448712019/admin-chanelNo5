@@ -1,8 +1,9 @@
-import React from 'react';
-import Redirect from 'umi/redirect';
-import { connect } from 'dva';
-import pathToRegexp from 'path-to-regexp';
-import Authorized from '@/utils/Authorized';
+import React from "react";
+import Redirect from "umi/redirect";
+import { connect } from "dva";
+import pathToRegexp from "path-to-regexp";
+import Authorized from "@/utils/Authorized";
+import cookie from "react-cookies";
 
 const getRouteAuthority = (path, routeData) => {
   let authorities;
@@ -28,20 +29,26 @@ const getRouteAuthority = (path, routeData) => {
 const AuthComponent = ({
   children,
   route = {
-    routes: [],
+    routes: []
   },
   location = {
-    pathname: '',
+    pathname: ""
   },
-  user,
+  user
 }) => {
   const { currentUser } = user;
   const { routes = [] } = route;
-  const isLogin = currentUser && currentUser.name;
+  const isLogin = cookie.load("currentUser") ? true : false;
   return (
     <Authorized
-      authority={getRouteAuthority(location.pathname, routes) || ''}
-      noMatch={isLogin ? <Redirect to="/exception/403" /> : <Redirect to="/user/login" />}
+      authority={getRouteAuthority(location.pathname, routes) || ""}
+      noMatch={
+        isLogin ? (
+          <Redirect to="/exception/403" />
+        ) : (
+          <Redirect to="/user/login" />
+        )
+      }
     >
       {children}
     </Authorized>
@@ -49,5 +56,5 @@ const AuthComponent = ({
 };
 
 export default connect(({ user }) => ({
-  user,
+  user
 }))(AuthComponent);

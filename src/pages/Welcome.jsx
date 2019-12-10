@@ -27,7 +27,7 @@ const ele = (
     }}
   >
     <h1 style={{ fontSize: "40px" }}>欢迎使用</h1>
-    <h3 style={{ fontSize: "45px" }}>后台管理系统</h3>
+    <h3 style={{ fontSize: "45px" }}>新人培训后台管理系统</h3>
   </div>
 );
 

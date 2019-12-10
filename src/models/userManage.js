@@ -61,6 +61,7 @@ export default {
       if (callback) callback(response);
     },
     *submitUser({ payload, callback }, { call, put }) {
+      console.log(payload)
       const response = yield call(submitUser, payload);
       if (callback) callback(response);
     },
